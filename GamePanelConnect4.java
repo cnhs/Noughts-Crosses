@@ -2,12 +2,12 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.awt.*;
 
-public class GamePanel extends JPanel implements ActionListener{
+public class GamePanelConnect4 extends JPanel implements ActionListener{
 	
-	private int width = 3;
-	private int height = 3;
+	private int width =7;
+	private int height = 6;
 	private int numOfTiles = width * height;
-	private int numToWin = 3;
+	private int numToWin = 4;
 	private int inARow;
 	private Tile[] tiles = new Tile[numOfTiles];
 	private char turn = 'O';
@@ -17,14 +17,14 @@ public class GamePanel extends JPanel implements ActionListener{
 	private JButton resetButton;
 	private int wwidth = 900;
 	private int wheight = 1000;
+	private boolean change = false;
 	private int[] winTiles = new int[numToWin];
 	private boolean filled = false;
 	
 	
 
-	public GamePanel(){
+	public GamePanelConnect4(){
 
-		System.out.println("jjjjjjjjjjjjjjjjWW");
 		
 		this.setLayout(new BorderLayout());
 		
@@ -52,21 +52,23 @@ public class GamePanel extends JPanel implements ActionListener{
 	
 		
 		// makes each of the items in the array a tile and it adds them to the layout and adds an action listener to each of them
-		 for (int i=0; i<this.tiles.length; i++) {
+		
+		for (int i=0; i<this.tiles.length; i++) {
 			 this.tiles[i] = new Tile(' ');
 			 buttonPanel.add(this.tiles[i]);
 			 tiles[i].addActionListener(this);
-			 tiles[i].setBackground(Color.yellow);
+			 tiles[i].setBackground(Color.gray);
 			 buttonPanel.setBackground(Color.BLACK);
 			 tiles[i].setFont(new Font("Forte", Font.PLAIN, wwidth/12));
-		
+			 
+		this.add(buttonPanel, BorderLayout.CENTER);
+		this.add(topPanel, BorderLayout.NORTH);
 		 }
-		 this.add(buttonPanel, BorderLayout.CENTER);
-		 this.add(topPanel, BorderLayout.NORTH);
 		 
-		
-		 System.out.println("ppppppppppppppppppppppppppppppp");
-	
+		 
+		 
+		 
+		 
 	}
 	
 	
@@ -83,8 +85,7 @@ public class GamePanel extends JPanel implements ActionListener{
 		
 		for (Tile tile: tiles) {
 			tile.setSymbol(' ');
-			tile.setBackground(Color.yellow);
-			winTiles = new int[numToWin];
+			tile.setBackground(Color.gray);
 		}
 		
 		turn = 'O';
@@ -105,6 +106,7 @@ public class GamePanel extends JPanel implements ActionListener{
 		return loc;
 	}
 	
+	
 	private void notInARow() {
 		if (winner == ' '){
 			inARow = 0;
@@ -113,9 +115,27 @@ public class GamePanel extends JPanel implements ActionListener{
 	}
 	
 	private void yesInARow(int row, int col) {
-		inARow +=1;
-		winTiles[inARow-1] = tileLocator(row,col);
+		if (winner == ' '){
+			inARow +=1;
+
+			winTiles[inARow-1] = tileLocator(row,col);
+		}
 	}
+	
+	private void nextTurn() {
+		
+		if (turn == 'O') {
+			turn = 'X';
+		}
+		
+		else {
+			turn = 'O';
+		}
+		
+		turnLabel.setText("Turn: "+ turn);
+		
+	}
+	
 	
 	public char checkWinner() {
 		
@@ -130,7 +150,6 @@ public class GamePanel extends JPanel implements ActionListener{
 			
 			// Checks Rows
 			
-			
 			for (int row=0; row<(height); row++ ){
 				notInARow();
 				
@@ -139,17 +158,18 @@ public class GamePanel extends JPanel implements ActionListener{
 						
 						if (tiles[tileLocator(row,col)].getSymbol() == check) {
 							yesInARow(row,col);
-						//	winTiles+=(tileLocator(row,col));
+							if (inARow >= numToWin){
+								winner = check;
+								turnLabel.setText("Winner Winner: " + winner);
+							}
+							
 						}
 						
 						else {
 							notInARow();
 						}
 						
-						if (inARow >= numToWin){
-							winner = check;
-							turnLabel.setText("Winner Winner: " + winner);
-						}
+						
 						
 						
 					}
@@ -164,10 +184,15 @@ public class GamePanel extends JPanel implements ActionListener{
 				notInARow();
 				
 				if (winner == ' ') {
-					for (int row=0; row<(width); row++ ){
+					for (int row=0; row<(height); row++ ){
 						
+
 						if (tiles[tileLocator(row,col)].getSymbol() == check) {
 							yesInARow(row,col);
+							if (inARow >= numToWin){
+								winner = check;
+								turnLabel.setText("Winner Winner: " + winner);
+							}
 							
 						}
 						
@@ -175,10 +200,7 @@ public class GamePanel extends JPanel implements ActionListener{
 							notInARow();
 						}
 						
-						if (inARow >= numToWin){
-							winner = check;
-							turnLabel.setText("Winner Winner: " + winner);
-						}
+						
 						
 						
 					}
@@ -196,19 +218,22 @@ public class GamePanel extends JPanel implements ActionListener{
 						if (tiles[tileLocator(row,col)].getSymbol() == check) {
 							yesInARow(row,col);
 							
+							
 							for (int d=1; d < numToWin; d++) {
+								
 								if (tiles[tileLocator(row+d,col+d)].getSymbol() == check) {
 									yesInARow(row+d,col+d);
+									if (inARow >= numToWin){
+										winner = check;
+										turnLabel.setText("Winner Winner: " + winner);
+									}
 								}
 								
 								else {
 									notInARow();
 								}
 								
-								if (inARow >= numToWin){
-									winner = check;
-									turnLabel.setText("Winner Winner: " + winner);
-								}
+								
 	
 							}
 						}
@@ -228,21 +253,21 @@ public class GamePanel extends JPanel implements ActionListener{
 						if (tiles[tileLocator(row,col)].getSymbol() == check) {
 							yesInARow(row,col);
 							
-							
 							for (int d=1; d < numToWin; d++) {
 								
 								if (tiles[tileLocator(row-d,col+d)].getSymbol() == check) {
 									yesInARow(row-d,col+d);
+									if (inARow >= numToWin){
+										winner = check;
+										turnLabel.setText("Winner Winner: " + winner);
+									}
 								}
 								
 								else {
 									notInARow();
 								}
 								
-								if (inARow >= numToWin){
-									winner = check;
-									turnLabel.setText("Winner Winner: " + winner);
-								}
+								
 	
 							}
 						}
@@ -250,10 +275,11 @@ public class GamePanel extends JPanel implements ActionListener{
 				}
 				
 			}
-			
-		
 		}
-	
+		
+		
+		
+		
 		if (winner != ' ') {
 			for (int num: winTiles) {
 				tiles[num].setBackground(Color.green);
@@ -275,35 +301,35 @@ public class GamePanel extends JPanel implements ActionListener{
 				}
 			}
 		}
-		
+	
 		return winner;
-		
 	
 	}
 	
 	
+	
 	public void actionPerformed(ActionEvent e) {
-		
-		for (int i=0; i<tiles.length; i++) {
-			if (check == ' '){
-				if (e.getSource() == tiles[i]) {
-					if (tiles[i].getSymbol() == ' '){
-						tiles[i].setSymbol(turn);
-						if (turn == 'X'){
-							turn = 'O';
+
+		for (int row=0; row<height; row++) {
+			for (int col=0; col<width; col++) {
+				
+				if (e.getSource() == tiles[tileLocator(row,col)] && winner == ' ') {
+					for (int r=height-1; r>-1; r--) {
+						
+						if (tiles[tileLocator(r,col)].getSymbol() == ' ' && change == false) {
+							tiles[tileLocator(r,col)].setSymbol(turn);
+							change = true;
+							
+							nextTurn();
 						}
-						else {
-							turn = 'X';
-						}
-						
-						turnLabel.setText("Turn: "+turn);
-						
-						check = checkWinner();
-						
 					}
 				}
 			}
 		}
+		
+		
+		change = false;
+		winner = checkWinner();
 		
 		
 		if (e.getSource() == resetButton) {
@@ -312,3 +338,7 @@ public class GamePanel extends JPanel implements ActionListener{
 	}
 			
 }
+
+
+
+
